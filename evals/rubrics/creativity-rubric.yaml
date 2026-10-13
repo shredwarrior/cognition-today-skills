@@ -1,0 +1,120 @@
+# Creativity rubric for create-through-recomposition.
+# Judge final artifacts and observable decisions only.
+# Novelty is never scored alone.
+
+rubric_id: creativity
+version: 0.1.0-draft
+applies_to: create-through-recomposition
+pairs_with: trigger-rubric.yaml
+
+scale:
+  0: Absent or actively harmful
+  1: Present but superficial or misapplied
+  2: Correct and useful
+  3: Correct, useful, and materially better than the baseline arm
+
+dimensions:
+  - id: structural_diversity
+    question: Do the candidates differ in units, relations, or organizing principle rather than in wording?
+    weight: 2.0
+    test: >-
+      For each adjacent pair of candidates, can a judge name a unit that changed,
+      a relation that changed, or an organizing principle that changed? If not,
+      the pair counts as lexical variation.
+    anti_signal: The same premise with different nouns, settings, or adjectives.
+
+  - id: novelty_relative_to_input
+    question: Is the output meaningfully different from the initial representation the user supplied?
+    note: Measured against the input, not against the judge's general taste.
+
+  - id: usefulness
+    question: Does the output serve the objective and the audience defined in Step 1?
+    weight: 2.0
+
+  - id: coherence
+    question: Do the recomposed candidates hold together internally, with causal and functional relations restored?
+    anti_signal: An interesting combination that does not survive one question about how it works.
+
+  - id: constraint_preservation
+    question: Are all locked invariants, user-approved elements, and factual requirements intact?
+    scoring: Binary per invariant. Any violation is logged as a severe failure.
+    weight: 2.0
+
+  - id: factuality
+    question: Does the output avoid inventing facts, sources, quotes, history, or capabilities for creative effect?
+    scoring: Binary. Any violation is 0 and is logged as a severe failure.
+
+  - id: operator_fit
+    question: Was the selected operator appropriate to the diagnosed blockage, and were at most three operators used?
+    anti_signal: A tour through many techniques, or an operator applied without a diagnosis.
+
+  - id: mechanism_not_decoration
+    question: When borrowing from another domain, was a mechanism or relation transferred rather than surface imagery?
+    applies_when: cross-domain borrowing was used.
+
+  - id: randomness_tested
+    question: Was every chance pairing followed by a stated relation and a relevance test?
+    applies_when: chance configuration was used.
+
+  - id: construal_round_trip
+    question: If construal was raised to find the possibility, was it lowered again to make the result executable?
+    anti_signal: A striking direction that cannot be built, presented as a deliverable.
+
+  - id: convergence_quality
+    question: After divergence, was the comparison compact, criteria-based, and decisive?
+    anti_signal: Vague preference language, or presenting all candidates as equally good.
+
+  - id: preference_learning
+    question: Across repeated revisions, does the output reflect accumulated user preference evidence over generic convention?
+    applies_when: class involves iteration.
+
+  - id: delta_reporting
+    question: During repeated revision, is there a clear record of what changed, what stayed fixed, and what was rejected?
+    applies_when: class involves iteration.
+
+  - id: technical_rescue_quality
+    question: For stuck technical problems, did the response produce a falsifiable hypothesis and hand control back to deterministic testing?
+    applies_when: the persistent-failure gate was satisfied.
+    weight: 2.0
+    anti_signal: A list of interesting possibilities with no test attached.
+
+  - id: no_human_cognition_claims
+    question: Does the response avoid claiming the agent activates neural networks, holds working memory, incubates, or experiences insight?
+    scoring: Binary. Any violation is 0 and is logged as a severe failure.
+
+  - id: convergence_respect
+    question: After the user selected a direction, did generation stop?
+    applies_when: the user made a selection.
+
+penalties:
+  - id: novelty_without_use
+    description: A surprising result that damages coherence, factuality, feasibility, or the user's approved direction.
+    effect: Overall score capped at 1. Logged as a regression regardless of preference score.
+  - id: constraint_erosion
+    description: A locked invariant quietly relaxed to enable a variant.
+    effect: The variant is scored invalid, not merely penalized.
+  - id: creative_debugging
+    description: Ideation substituted for reading evidence on a first-pass technical problem.
+    effect: Overall score 0 for that prompt.
+  - id: endless_divergence
+    description: New variants produced after the user selected a direction.
+    effect: Cap convergence_respect at 0 and cap the overall score at 1.
+
+blind_preference:
+  instruction: >-
+    In addition to the dimension scores, run a blind pairwise preference between
+    the baseline arm and the skill arm. Randomize order, hide condition labels,
+    permit ties, and report order-dependent judgments.
+  target_win_rate: 0.60
+
+aggregation:
+  method: weighted mean of applicable dimensions, per prompt, then across prompts
+  report_separately:
+    - positive
+    - negative
+    - boundary
+    - long-context
+  never_average_away:
+    - constraint_preservation failures
+    - factuality failures
+    - no_human_cognition_claims failures

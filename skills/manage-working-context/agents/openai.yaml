@@ -1,0 +1,15 @@
+interface:
+  display_name: "Simulated Working Memory"
+  short_description: "Preserve intent, decisions, and provenance across compaction"
+  brand_color: "#4be4ff"
+  default_prompt: "Use $manage-working-context to preserve our objective, locked decisions, and next action across this long session."
+policy:
+  allow_implicit_invocation: true
+
+# Icon paths are intentionally absent. Add them only after real Cognition Today
+# logo assets are supplied; do not point metadata at nonexistent files.
+#
+# This runtime is the other end of the coordination contract that Cognition Today
+# domain skills embed in their SKILL.md. That relationship is expressed in
+# SKILL.md and in references/capsule-contract.md, not here. `dependencies.tools`
+# is a tool schema and must not be used to declare a relationship to a skill.

@@ -1,0 +1,247 @@
+# Machine-readable graph and enumerations for manage-working-context.
+# Every table and flow in this package has an equivalent here so that an agent
+# never has to infer runtime logic from prose.
+
+meta:
+  skill: manage-working-context
+  role: shared runtime for the Cognition Today skill collection
+  source_ids:
+    - https://cognitiontoday.com/memory-models-in-psychology-understanding-human-memory/
+    - https://cognitiontoday.com/a-thrifty-brain-gave-us-multi-tasking-abilities/
+    - https://cognitiontoday.com/metacognition-metamemory-meta-skills/
+  specification_id: master-specification#5
+  author: Aditya Shukla
+  publication: Cognition Today
+  graph_status: transcribed-from-specification
+  source_visual_verified: false
+  grounding_note: >-
+    Predominantly author-specified rather than article-derived. None of the three
+    cited articles was read during this build. See references/source-notes.md.
+
+# --- State flow -------------------------------------------------------------
+
+nodes:
+  - id: domain_skill
+    type: external_actor
+    label: A Cognition Today domain skill that has met a runtime trigger
+  - id: capsule
+    type: message
+    label: Source-intent capsule, version 1
+  - id: working_context
+    type: state_file
+    label: working-context.md, short mutable representation
+  - id: memory_base
+    type: state_file
+    label: memory-base.md, durable ledger
+  - id: ordinary_step
+    type: operation
+    label: Ordinary work step, rewrites the working context only
+  - id: freeze
+    type: operation
+    label: Consolidation step one, writes settled material to the ledger
+  - id: derive
+    type: operation
+    label: Consolidation step two, rewrites the working context for the next phase
+  - id: compaction
+    type: external_event
+    label: Context compaction
+  - id: resume
+    type: operation
+    label: Recovery after compaction or thread switch
+
+edges:
+  - from: domain_skill
+    to: capsule
+    relation: emits
+    condition: at_least_one_runtime_trigger_holds
+  - from: capsule
+    to: working_context
+    relation: ingested_into
+  - from: ordinary_step
+    to: working_context
+    relation: rewrites
+  - from: ordinary_step
+    to: memory_base
+    relation: must_not_write
+    note: The mutation invariant.
+  - from: working_context
+    to: freeze
+    relation: read_by
+    condition: consolidation_boundary_reached
+  - from: freeze
+    to: memory_base
+    relation: writes
+  - from: freeze
+    to: derive
+    relation: precedes
+    note: Sequential, never simultaneous.
+  - from: derive
+    to: working_context
+    relation: rewrites
+  - from: compaction
+    to: resume
+    relation: triggers
+  - from: memory_base
+    to: resume
+    relation: read_first_by
+  - from: working_context
+    to: resume
+    relation: read_second_by
+  - from: resume
+    to: domain_skill
+    relation: returns_capsule_with_retrieval_status
+
+# --- Enumerations -----------------------------------------------------------
+
+activation_triggers:
+  layer: author-specified
+  source_id: master-specification#5
+  any_one_suffices: true
+  values:
+    - task-spans-many-tool-calls-or-compactions
+    - three-or-more-interdependent-workstreams
+    - earlier-decisions-or-approved-elements-must-not-be-overwritten
+    - large-corpus-must-be-reduced-to-an-active-representation
+    - unfinished-thread-will-be-resumed-later
+    - repeated-iterations-require-tracking-what-changed-and-what-stayed-fixed
+
+discovery_rules:
+  layer: author-specified
+  source_id: master-specification#5
+  values:
+    - check-registered-or-discoverable-skills-for-an-exact-name-match
+    - if-no-registry-check-only-documented-or-authorized-skill-roots
+    - never-recursively-scan-arbitrary-filesystem-locations
+    - never-install-copy-or-modify-the-runtime-automatically
+    - do-not-activate-merely-because-it-exists
+    - activate-only-when-a-trigger-holds
+    - continue-normally-when-it-is-missing
+
+state_files:
+  layer: author-specified
+  source_id: master-specification#5
+  values:
+    - id: working-context.md
+      function: Current objective, active operation, constraints, decisions, uncertainty, pointers, next action
+      mutation_policy: The only file rewritten during ordinary work
+      size_target_lines: 100
+    - id: memory-base.md
+      function: Stable definitions, evidence, approved decisions, failed approaches, provenance, resumable thread capsules
+      mutation_policy: Updated only at an explicit consolidation boundary
+      size_target_lines: 400
+
+mutation_invariant:
+  layer: author-specified
+  source_id: master-specification#5
+  rule: never-write-both-files-in-one-ordinary-step
+  consolidation_sequence:
+    - freeze-settled-material-into-memory-base
+    - then-separately-derive-the-next-working-context
+
+consolidation_boundaries:
+  layer: design-inference
+  values:
+    - user-approved-an-element-decision-or-direction
+    - workstream-completed
+    - thread-paused-for-a-switch
+    - compaction-expected-or-announced
+    - iteration-round-closed-with-settled-deltas
+    - session-ending
+  prohibited: mid-operation
+
+capsule_schema:
+  version: 1
+  layer: author-specified
+  source_id: master-specification#5
+  required:
+    - objective
+    - active_skill
+    - active_operation
+    - next_action
+  optional_omit_when_empty:
+    - source_ids
+    - governing_source_claims
+    - design_inferences
+    - locked_constraints
+    - approved_elements
+    - completed_transformations
+    - rejected_approaches
+    - open_uncertainties
+  return_only:
+    - retrieval_status
+    - missing
+  invariant: governing_source_claims and design_inferences are never merged
+
+retrieval_status:
+  layer: design-inference
+  values:
+    - id: complete
+      meaning: Every returned field was read from a state file
+    - id: partial
+      meaning: Some fields were absent or inferred; missing is populated
+    - id: unavailable
+      meaning: No state was found
+  rule: never-report-complete-for-a-reconstructed-field
+
+failure_handling:
+  layer: design-inference
+  rules:
+    - situation: state-file-missing
+      response: report-unavailable-and-offer-to-initialize
+    - situation: state-file-malformed
+      response: read-what-parses-report-the-rest-missing-do-not-rewrite
+    - situation: pointer-target-moved-or-deleted
+      response: name-the-broken-pointer-do-not-substitute
+    - situation: required-capsule-field-absent
+      response: name-it-in-missing-do-not-infer
+    - situation: capsule-contradicts-the-ledger
+      response: store-both-and-flag-resolution-is-a-domain-decision
+  universal: report-the-gap-never-fill-it
+
+conflict_precedence:
+  layer: design-inference
+  rules:
+    - subject: approved-decisions-and-locked-constraints
+      wins: memory_base
+    - subject: active-operation-and-next-action
+      wins: working_context
+    - subject: user-contradicts-a-locked-constraint
+      resolution: treat-as-an-unlock-record-the-change-at-next-consolidation
+
+degraded_mode:
+  layer: design-inference
+  trigger: no-filesystem-access
+  rules:
+    - maintain-the-same-field-structure-in-the-visible-conversation
+    - restate-working-context-fields-at-boundaries
+    - state-once-that-nothing-is-persisted
+    - never-claim-a-file-was-written-or-that-state-survives-the-session
+
+ownership_boundary:
+  layer: author-specified
+  source_id: master-specification#5
+  runtime_owns:
+    - attention
+    - continuity
+    - retrieval-pointers
+    - compaction-safe-state
+  runtime_must_not:
+    - select-a-domain-operation
+    - judge-a-candidate
+    - edit-a-domain-artifact
+    - reinterpret-or-broaden-a-domain-skill
+  domain_skill_must_not:
+    - directly-mutate-the-state-files-without-a-delegated-documented-operation
+
+dependency_states:
+  layer: author-specified
+  source_id: master-specification#11
+  values:
+    - id: runtime-absent
+      expected: Domain skill completes normally and does not claim persistence
+    - id: runtime-present-trigger-absent
+      expected: Runtime remains inactive
+    - id: runtime-present-trigger-present
+      expected: Runtime activates and receives a complete compact capsule
+    - id: runtime-active-across-compaction
+      expected: Source claims, design inferences, user decisions, rejected approaches, active operation, and next action remain distinguishable

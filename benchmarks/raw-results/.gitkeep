@@ -1,0 +1,2 @@
+# Raw machine-readable prompts, outputs, judgments, and scores go here, one
+# subdirectory per run_id. Empty until a benchmark has actually been run.

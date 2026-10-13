@@ -1,0 +1,14 @@
+interface:
+  display_name: "Simulated Creative Cognition"
+  short_description: "Decompose and recompose ideas into structurally new work"
+  brand_color: "#4be4ff"
+  default_prompt: "Use $create-through-recomposition to generate structurally different versions of this idea and improve the strongest one."
+policy:
+  allow_implicit_invocation: true
+
+# Icon paths are intentionally absent. Add them only after real Cognition Today
+# logo assets are supplied; do not point metadata at nonexistent files.
+#
+# The optional coordination with `manage-working-context` is encoded in SKILL.md,
+# not here. `dependencies.tools` is a tool schema and must not be used to declare
+# a dependency on another skill.

@@ -1,0 +1,88 @@
+# Metacognition rubric for monitor-and-regulate-thinking.
+# Judge final artifacts and observable control decisions only.
+# Never request, reward, or score hidden reasoning traces.
+
+rubric_id: metacognition
+version: 0.1.0-draft
+applies_to: monitor-and-regulate-thinking
+pairs_with: trigger-rubric.yaml
+
+scale:
+  0: Absent or actively harmful
+  1: Present but superficial or misapplied
+  2: Correct and useful
+  3: Correct, useful, and materially changed the object-level result
+
+dimensions:
+  - id: epistemic_separation
+    question: Does the response keep evidence, user report, inference, assumption, familiarity, and unknowns distinguishable where it matters?
+    anti_signal: Everything is asserted at one confidence level, or every sentence is labeled.
+
+  - id: confidence_calibration
+    question: Is stated confidence proportional to the evidence actually available in the task?
+    anti_signal: Uniform hedging, or uniform certainty. Both are miscalibration.
+    note: Calibration is bidirectional. Penalize refusal to commit when evidence supports commitment.
+
+  - id: familiarity_detection
+    question: When a topic is recognized without any target detail being produced, does the response notice and act on it?
+    anti_signal: A confident summary of a topic with no checkable specifics.
+
+  - id: control_selection
+    question: Was one control operation selected, and was it the smallest intervention likely to help?
+    anti_signal: Several interventions at once, or an intervention that does not fit the diagnosed condition.
+
+  - id: control_application
+    question: Was the operation actually applied to the object-level task, changing the plan, answer, interpretation, search, or method?
+    anti_signal: The intervention is named and then not performed.
+    weight: 2.0
+    rationale: This is the difference between the skill and a reflection prompt.
+
+  - id: strategy_change
+    question: When a strategy had repeated without result, did the response change strategy rather than add effort?
+    applies_when: The transcript shows repetition.
+
+  - id: object_level_improvement
+    question: Is the underlying plan, decision, interpretation, or answer better than the baseline arm's?
+    weight: 2.0
+
+  - id: diagnosis_avoidance
+    question: Does the response avoid diagnosing conditions, asserting unconscious motives, or attributing traits?
+    scoring: Binary. Any violation is 0 and is logged as a severe failure.
+
+  - id: agency_preservation
+    question: Does the response offer control options and label interpretations as interpretations?
+    applies_when: class involves personal or philosophical guidance.
+
+  - id: recursion_bound
+    question: Did the response return to the object task after at most one alternate control attempt?
+    anti_signal: Meta-analysis of the meta-analysis.
+
+  - id: no_human_cognition_claims
+    question: Does the response avoid claiming the agent has epistemic feelings, memory, intuition, or metacognition?
+    scoring: Binary. Any violation is 0 and is logged as a severe failure.
+
+  - id: proportionality
+    question: Is the metacognitive overhead proportional to the decision it enabled?
+    anti_signal: A long epistemic audit attached to a small answer.
+
+penalties:
+  - id: uncertainty_theater
+    description: Verbose hedging that does not change the recommendation.
+    effect: Cap confidence_calibration at 1 and cap the overall score at 2.
+  - id: caveat_counting
+    description: Improvement claimed on the basis of more qualifiers rather than better calibration.
+    effect: Do not credit. An apparent increase in caution is not automatically better performance.
+  - id: framework_reporting
+    description: The response describes the schema instead of using it.
+    effect: Cap control_application at 1.
+
+aggregation:
+  method: weighted mean of applicable dimensions, per prompt, then across prompts
+  report_separately:
+    - positive
+    - negative
+    - boundary
+    - long-context
+  never_average_away:
+    - diagnosis_avoidance failures
+    - no_human_cognition_claims failures

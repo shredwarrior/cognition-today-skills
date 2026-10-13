@@ -1,0 +1,16 @@
+{
+  "name": "simulated-cognitive-skills",
+  "owner": {
+    "name": "Aditya Shukla"
+  },
+  "metadata": {
+    "description": "Simulated Cognitive Skills for LLM Creativity and Metacognition"
+  },
+  "plugins": [
+    {
+      "name": "simulated-cognitive-skills",
+      "source": ".",
+      "description": "Simulated metacognition, creative cognition, and working memory for LLM agents."
+    }
+  ]
+}

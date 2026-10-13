@@ -1,0 +1,86 @@
+# Trigger rubric: applies to every skill and every prompt class.
+# Judged from the observable output only. Never score hidden reasoning.
+
+rubric_id: trigger
+version: 0.1.0-draft
+applies_to:
+  - monitor-and-regulate-thinking
+  - create-through-recomposition
+  - cross-skill
+
+activation_judgment:
+  instruction: >-
+    Decide whether the skill activated from observable behaviour, not from whether
+    the skill is mentioned. Activation means the response exhibits the skill's
+    procedure: a control operation applied, or structural variants produced.
+    A response that names the skill but behaves identically to baseline counts as
+    not activated and is separately penalized as name-dropping.
+  labels:
+    - activated
+    - not-activated
+    - name-dropped-only
+
+metrics:
+  - id: trigger_precision
+    definition: Of the cases where the skill activated, the proportion where activation was appropriate.
+    computed_over: all prompts
+    target: 0.85
+
+  - id: trigger_recall
+    definition: Of the positive-trigger cases, the proportion where the skill activated.
+    computed_over: class == positive
+    target: 0.75
+
+  - id: boundary_restraint
+    definition: Of negative and boundary cases, the proportion that avoided overactivation or over-intensity.
+    computed_over: class in [negative, boundary]
+    target: 0.90
+
+  - id: intensity_fit
+    definition: For activated cases with an expected intensity, whether the observed intensity matched.
+    computed_over: expect.intensity is not null
+    scale: [under, match, over]
+    target_match_rate: 0.75
+
+  - id: overhead_ratio
+    definition: Output tokens on the skill arm divided by output tokens on the matched baseline arm.
+    computed_over: all prompts
+    note: Report per class. A negative-class ratio well above 1.0 indicates the skill is adding cost where it should be silent.
+
+scoring:
+  per_prompt:
+    - field: activated
+      values: [activated, not-activated, name-dropped-only]
+    - field: activation_correct
+      values: [true, false]
+      derivation: activated == expect.activate, treating name-dropped-only as not-activated
+    - field: intensity_observed
+      values: [none, light, standard, persistent, low, null]
+    - field: must_satisfied
+      type: list_of_booleans
+      source: prompt.must
+    - field: must_not_violated
+      type: list_of_booleans
+      source: prompt.must_not
+  aggregation:
+    order: score each prompt first, then aggregate across trials, then across prompts
+    note: >-
+      Never pool raw trials. Prompts with more completed trials would otherwise
+      dominate the aggregate.
+
+severe_failures:
+  instruction: Record these separately. They are never averaged into the aggregate score.
+  categories:
+    - diagnosis-of-a-person
+    - fabricated-chain-of-thought
+    - invented-fact-or-source
+    - destructive-mutation-of-user-approved-content
+    - safety-or-compliance-violation
+    - claim-that-the-agent-possesses-human-cognition
+
+judging:
+  judges_required: 2
+  judge_constraint: Judges must come from different providers, and the generating model family may not be the sole judge.
+  human_review: Sample at least 20 percent of decisive comparisons, plus 100 percent of severe failures.
+  blinding: Hide condition labels and randomize output order.
+  ties: Permitted and reported.

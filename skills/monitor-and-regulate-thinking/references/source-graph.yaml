@@ -1,0 +1,200 @@
+# Machine-readable graph and enumerations for monitor-and-regulate-thinking.
+# Every table and flow in this package has an equivalent here so that an agent
+# never has to infer runtime logic from prose or from an image.
+
+meta:
+  skill: monitor-and-regulate-thinking
+  source_id: https://cognitiontoday.com/metacognition-metamemory-meta-skills/
+  author: Aditya Shukla
+  publication: Cognition Today
+  graph_status: transcribed-from-specification
+  source_visual_verified: false
+  note: >-
+    No source flowchart image was supplied with this build. The graph below
+    transcribes the object/meta loop as described in the master specification
+    and in references/metacognition-model.md. If an original diagram is later
+    added under assets/, verify this graph against it and set
+    source_visual_verified to true.
+
+# --- Object/meta monitoring and control loop -------------------------------
+
+nodes:
+  - id: object_state
+    type: state
+    label: The claim, plan, choice, interpretation, problem, artifact, or action under consideration
+  - id: monitoring
+    type: operation
+    label: Read object-level state, evidence, confidence, attention, progress, and retrieval condition
+  - id: meta_model
+    type: state
+    label: Compact model of knowledge state, strategy, uncertainty, constraints, and user self-report
+  - id: control
+    type: operation
+    label: Select and apply one intervention that modifies the object-level process
+  - id: revised_object_state
+    type: state
+    label: The object-level artifact after the intervention
+
+edges:
+  - from: object_state
+    to: monitoring
+    relation: observed_by
+  - from: monitoring
+    to: meta_model
+    relation: updates
+  - from: meta_model
+    to: control
+    relation: selects
+  - from: control
+    to: revised_object_state
+    relation: modifies
+  - from: revised_object_state
+    to: monitoring
+    relation: feeds_back_to
+    condition: evaluation_showed_no_change_and_one_alternate_control_remains
+
+# --- Enumerations ----------------------------------------------------------
+
+epistemic_states:
+  layer: design-inference
+  values:
+    - id: verified-known
+      meaning: Directly supported by reliable evidence available in the task
+    - id: retrieved-unverified
+      meaning: Recalled or generated with confidence but not checked
+    - id: user-reported
+      meaning: Stated by the user and relevant as their experience, preference, or belief
+    - id: familiar-cue
+      meaning: The label or topic feels known but details have not been retrieved
+    - id: partial-access
+      meaning: Some details are accessible, but the target knowledge is incomplete
+    - id: competing-retrieval
+      meaning: Several related candidates interfere with confident selection
+    - id: design-inference
+      meaning: An agent-side operationalization rather than an article claim
+    - id: assumption
+      meaning: Currently relied upon without adequate support
+    - id: conflicting
+      meaning: Available claims or memories disagree
+    - id: unknown
+      meaning: No adequate knowledge is currently available
+
+control_operations:
+  layer: design-inference
+  note: Source grounds the existence of control; the specific operation set is compiler-added.
+  values:
+    - continue
+    - reframe
+    - verify
+    - retrieve
+    - ask
+    - decompose
+    - change-strategy
+    - redirect-attention
+    - reduce-confidence
+    - increase-confidence
+    - defer-judgment
+
+control_routing:
+  layer: design-inference
+  keyed_on: observed_condition
+  rules:
+    - condition: missing-evidence
+      operation: verify
+      alternate: retrieve
+    - condition: familiarity-mistaken-for-knowledge
+      operation: retrieve
+      alternate: ask
+    - condition: unclear-problem-representation
+      operation: reframe
+      alternate: decompose
+    - condition: strategy-repeatedly-fails
+      operation: change-strategy
+    - condition: too-many-active-considerations
+      operation: redirect-attention
+      alternate: decompose
+    - condition: competing-possibilities
+      operation: verify
+      alternate: decompose
+    - condition: confidence-exceeds-evidence
+      operation: reduce-confidence
+    - condition: confidence-below-evidence
+      operation: increase-confidence
+    - condition: blocking-unknown
+      operation: ask
+      alternate: defer-judgment
+    - condition: reflection-becoming-recursive
+      operation: continue
+      note: Return immediately to the object-level task.
+
+retrieval_condition_models:
+  layer: source-grounded
+  source_id: https://cognitiontoday.com/metacognition-metamemory-meta-skills/#theories-of-metamemory
+  values:
+    - id: cue-familiarity
+      signal: A label is familiar while details are absent
+      control: retrieve
+    - id: accessibility
+      signal: A partial detail is easy to retrieve
+      control: verify
+    - id: competition
+      signal: Several related candidates interfere
+      control: decompose
+    - id: interaction
+      signal: Familiarity is consulted first; partial retrieval is attempted when it fails
+      control: retrieve
+      note: Cheap cue check first, expensive targeted retrieval second.
+
+metamemory_dimensions:
+  layer: source-grounded
+  source_id: https://cognitiontoday.com/metacognition-metamemory-meta-skills/#metamemory
+  values:
+    - id: strategy
+      agent_question: What retrieval, recording, verification, or memory-support strategy is available?
+    - id: task
+      agent_question: Does the task require recall, recognition, familiarity, external lookup, or on-the-go analysis?
+    - id: capacity
+      agent_question: Is the currently available context sufficient for the task?
+      prohibition: Do not generalize to a person's global capacity.
+    - id: change
+      agent_question: Has recall or confidence changed across attempts or contexts?
+    - id: anxiety
+      agent_question: Has the user reported stress that may affect their confidence or retrieval?
+      prohibition: Do not infer it clinically or when unreported.
+    - id: activities
+      agent_question: Has the user identified conditions that support or impair their recall or performance?
+    - id: achievement-motivation
+      agent_question: How strongly does the user want to improve, verify, or retain the material?
+    - id: locus
+      agent_question: What aspects of the problem are controllable through external support, practice, or verification?
+
+intensity_levels:
+  layer: design-inference
+  values:
+    - id: light
+      use_when: A personal or philosophical response benefits from one calibration step
+      behavior: Make one useful distinction or ask one targeted question; do not expose the schema.
+    - id: standard
+      use_when: Strategy, planning, or knowledge calibration materially affects the answer
+      behavior: Run the full object-monitor-control-evaluate loop.
+    - id: persistent
+      use_when: Long context, multiple workstreams, repeated revisions, or thread switching
+      behavior: Run the full loop and coordinate with manage-working-context when available and triggered.
+
+state_schema_fields:
+  - object_task
+  - meta_objective
+  - locked_constraints
+  - known
+  - user_reported
+  - inferred
+  - assumed
+  - familiar_but_unretrieved
+  - partial_or_competing
+  - unknown
+  - confidence_notes
+  - active_strategy
+  - control_operation
+  - verification_needed
+  - evaluation_result
+  - next_check

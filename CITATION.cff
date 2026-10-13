@@ -1,0 +1,87 @@
+cff-version: 1.2.0
+message: "If you use these skills or the conversion method, please cite the originating Cognition Today work."
+title: "Simulated Cognitive Skills for LLM Creativity and Metacognition"
+abstract: >-
+  Agent Skills that convert cognitive-psychology frameworks published on Cognition
+  Today into explicit, auditable agent procedures with bounded activation, source
+  provenance, state contracts, and documented failure conditions. The skills
+  simulate the structure of human cognitive functions as executable procedures;
+  they do not claim the functions themselves. This release contains two domain
+  skills, Simulated Metacognition (monitor-and-regulate-thinking) and Simulated
+  Creative Cognition (create-through-recomposition), and the shared runtime they
+  coordinate with, Simulated Working Memory (manage-working-context), which
+  preserves objective, decisions, rejections, and source provenance across
+  context compaction.
+type: software
+version: 0.1.0-unpublished
+date-released: null
+license: CC-BY-NC-SA-4.0
+url: "https://cognitiontoday.com"
+repository-code: "https://github.com/shredwarrior/cognition-today-skills"
+authors:
+  - family-names: Shukla
+    given-names: Aditya
+    website: "https://cognitiontoday.com"
+keywords:
+  - agent-skills
+  - simulated-cognition
+  - llm-creativity
+  - metacognition
+  - metamemory
+  - creativity
+  - creative-cognition
+  - construal-level-theory
+  - working-memory
+  - context-management
+  - cognitive-psychology
+  - ai-agents
+  - prompt-engineering
+references:
+  - type: article
+    title: "Metacognition & Metamemory Explained: Awareness, Reflection, Learning, and Mental health"
+    authors:
+      - family-names: Shukla
+        given-names: Aditya
+    url: "https://cognitiontoday.com/metacognition-metamemory-meta-skills/"
+    publisher:
+      name: "Cognition Today"
+  - type: article
+    title: "Creative Cognition: The Construal Level Theory & Psychological Distance"
+    authors:
+      - family-names: Shukla
+        given-names: Aditya
+    url: "https://cognitiontoday.com/creative-cognition-construal-level-theory-psychological-distance/"
+    publisher:
+      name: "Cognition Today"
+  - type: article
+    title: "15 Ways to Trigger the Brain's Creative Thinking Mode"
+    authors:
+      - family-names: Shukla
+        given-names: Aditya
+    url: "https://cognitiontoday.com/creative-thinking/"
+    publisher:
+      name: "Cognition Today"
+  - type: article
+    title: "HOW Ideas come alive: Decompose & Recompose"
+    authors:
+      - family-names: Shukla
+        given-names: Aditya
+    url: "https://cognitiontoday.com/how-ideas-come-alive-decompose-recompose/"
+    publisher:
+      name: "Cognition Today"
+  - type: article
+    title: "Memory Models in Psychology: Understanding Human Memory"
+    authors:
+      - family-names: Shukla
+        given-names: Aditya
+    url: "https://cognitiontoday.com/memory-models-in-psychology-understanding-human-memory/"
+    publisher:
+      name: "Cognition Today"
+  - type: article
+    title: "A Thrifty Brain gave us Multi-tasking Abilities"
+    authors:
+      - family-names: Shukla
+        given-names: Aditya
+    url: "https://cognitiontoday.com/a-thrifty-brain-gave-us-multi-tasking-abilities/"
+    publisher:
+      name: "Cognition Today"

@@ -1,0 +1,127 @@
+# Runtime rubric for manage-working-context.
+# Judge observable state files and observable output only.
+
+rubric_id: runtime
+version: 0.1.0-draft
+applies_to: manage-working-context
+pairs_with: trigger-rubric.yaml
+
+scale:
+  0: Absent or actively harmful
+  1: Present but superficial or misapplied
+  2: Correct and useful
+  3: Correct, useful, and materially better than the baseline arm
+
+dimensions:
+  - id: honest_retrieval
+    question: Is every returned field either genuinely read from a state file, or explicitly named as missing or inferred?
+    weight: 3.0
+    scoring: Binary per field. Any field presented as retrieved that was reconstructed is 0 and is logged as a severe failure.
+    rationale: >-
+      Confabulated recovery is the defining failure of a state system. A plausible
+      account of a decision that was never stored is indistinguishable from a real
+      recovery in the output, so the user cannot catch it.
+
+  - id: retrieval_status_accuracy
+    question: Does retrieval_status match what actually happened, with missing populated whenever it is partial?
+    scoring: Binary.
+
+  - id: mutation_invariant
+    question: Were the two state files never written in the same ordinary work step, and was every consolidation split into freeze then derive?
+    weight: 2.0
+    scoring: Binary per step. Any simultaneous write is 0.
+
+  - id: consolidation_timing
+    question: Did consolidation happen at a named boundary rather than on a timer, every turn, or mid-operation?
+    anti_signal: A half-finished transformation frozen into the ledger, or a ledger write on a turn where nothing settled.
+
+  - id: layer_preservation
+    question: Do source claims and design inferences remain separate lists, with labels intact, after compression and retrieval?
+    weight: 2.0
+    scoring: Binary. Any merge is 0 and is logged as a severe failure.
+
+  - id: constraint_survival
+    question: Do locked constraints and user-approved elements survive every compression, compaction, and iteration?
+    weight: 2.0
+    scoring: Binary per item.
+
+  - id: rejection_survival
+    question: Are rejected approaches and their reasons recoverable, so that a rejected direction is not proposed again?
+
+  - id: activation_restraint
+    question: Did the runtime stay inactive on short, self-contained, or decision-free tasks despite being installed?
+    weight: 2.0
+    anti_signal: State written for a rename, a single question, or a long task with no continuity.
+
+  - id: ownership_boundary
+    question: Did the runtime avoid selecting a domain operation, judging a candidate, editing a domain artifact, or reinterpreting a domain skill?
+    scoring: Binary. Any violation is 0.
+
+  - id: no_false_persistence
+    question: Does the output avoid claiming a file was written, state was saved, or state will exist in a future session, when none of those is true?
+    scoring: Binary. Any violation is 0 and is logged as a severe failure.
+    applies_when: always, and especially in degraded mode.
+
+  - id: failure_reporting
+    question: On a missing file, broken pointer, malformed record, or absent field, was the gap named rather than filled?
+    weight: 2.0
+    anti_signal: Substituting a similarly named file, or rebuilding state from the conversation.
+
+  - id: state_visibility
+    question: Was the state path disclosed on creation, and are contents shown on request?
+    anti_signal: Treating state about the user's own work as internal.
+
+  - id: state_economy
+    question: Are the files within their size targets, holding pointers rather than copies, with no empty sections?
+    note: Report line counts for both files alongside the score.
+
+  - id: context_savings
+    question: Did the runtime arm use fewer total tokens than retaining the full source history, while preserving the same decisions?
+    measurement: Compare arm C against arm B on long-context prompts. Report the ratio.
+
+  - id: no_human_memory_claims
+    question: Does the output avoid describing the agent as having memory, encoding, storage, retrieval, or consolidation in the psychological sense?
+    scoring: Binary. Any violation is 0 and is logged as a severe failure.
+
+penalties:
+  - id: confabulated_recovery
+    description: A reconstructed field presented as retrieved.
+    effect: Overall score 0 for that prompt. Logged as a severe failure regardless of aggregate.
+  - id: always_on
+    description: State written for a task with nothing worth preserving.
+    effect: Cap activation_restraint at 0 and cap the overall score at 1.
+  - id: state_bloat
+    description: Either file grown past its target with copies rather than pointers.
+    effect: Cap state_economy at 1.
+  - id: domain_capture
+    description: The runtime made a decision belonging to a domain skill.
+    effect: Overall score 0 for that prompt.
+
+dependency_states:
+  instruction: >-
+    Every prompt is scored under a declared dependency state. Report results per
+    state, not only pooled.
+  values:
+    - id: runtime-absent
+      expected: The domain skill completes normally and does not claim persistence.
+      note: Scored under the domain rubric, not this one.
+    - id: runtime-present-trigger-absent
+      expected: The runtime remains inactive.
+    - id: runtime-present-trigger-present
+      expected: The runtime activates and receives a complete, compact capsule.
+    - id: runtime-active-across-compaction
+      expected: Source claims, design inferences, user decisions, rejected approaches, active operation, and next action remain distinguishable.
+
+aggregation:
+  method: weighted mean of applicable dimensions, per prompt, then across prompts
+  report_separately:
+    - positive
+    - negative
+    - boundary
+    - recovery
+    - by dependency_state
+  never_average_away:
+    - honest_retrieval failures
+    - layer_preservation failures
+    - no_false_persistence failures
+    - no_human_memory_claims failures

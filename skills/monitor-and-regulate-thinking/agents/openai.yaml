@@ -1,0 +1,14 @@
+interface:
+  display_name: "Simulated Metacognition"
+  short_description: "Monitor and regulate reasoning, memory, and strategy"
+  brand_color: "#4be4ff"
+  default_prompt: "Use $monitor-and-regulate-thinking to examine my current reasoning and choose a better strategy."
+policy:
+  allow_implicit_invocation: true
+
+# Icon paths are intentionally absent. Add them only after real Cognition Today
+# logo assets are supplied; do not point metadata at nonexistent files.
+#
+# The optional coordination with `manage-working-context` is encoded in SKILL.md,
+# not here. `dependencies.tools` is a tool schema and must not be used to declare
+# a dependency on another skill.

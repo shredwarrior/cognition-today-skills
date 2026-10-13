@@ -1,0 +1,27 @@
+{
+  "name": "simulated-cognitive-skills",
+  "displayName": "Simulated Cognitive Skills",
+  "description": "Simulated metacognition, creative cognition, and working memory for LLM agents. Procedures compiled from Cognition Today articles by Aditya Shukla.",
+  "version": "0.1.0-unpublished",
+  "author": {
+    "name": "Aditya Shukla",
+    "email": "adityashukla77@gmail.com"
+  },
+  "homepage": "https://cognitiontoday.com",
+  "repository": "https://github.com/shredwarrior/cognition-today-skills",
+  "license": "CC-BY-NC-SA-4.0",
+  "keywords": [
+    "agent-skills",
+    "metacognition",
+    "creativity",
+    "working-memory",
+    "simulated-cognition"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "skills",
+    "cognition",
+    "llm"
+  ],
+  "skills": "skills/*/SKILL.md"
+}

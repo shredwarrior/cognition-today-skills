@@ -1,0 +1,123 @@
+# Evaluation manifest for the Cognition Today deep cognitive skills.
+# Freeze this file, the prompt sets, and the rubrics before running any
+# benchmark whose results will be reported publicly.
+
+manifest_version: 0.1.0-draft
+status: unfrozen
+frozen_at: null
+repository_commit: null
+
+prompt_sets:
+  - id: monitor-and-regulate-thinking
+    path: prompts/monitor-and-regulate-thinking.jsonl
+    total: 40
+    composition:
+      positive: 15
+      negative: 10
+      boundary: 10
+      long-context: 5
+    rubrics:
+      - rubrics/trigger-rubric.yaml
+      - rubrics/metacognition-rubric.yaml
+
+  - id: create-through-recomposition
+    path: prompts/create-through-recomposition.jsonl
+    total: 40
+    composition:
+      positive: 15
+      negative: 10
+      boundary: 10
+      long-context: 5
+    rubrics:
+      - rubrics/trigger-rubric.yaml
+      - rubrics/creativity-rubric.yaml
+
+  - id: manage-working-context
+    path: prompts/manage-working-context.jsonl
+    total: 24
+    composition:
+      positive: 8
+      negative: 8
+      boundary: 4
+      recovery: 4
+    rubrics:
+      - rubrics/trigger-rubric.yaml
+      - rubrics/runtime-rubric.yaml
+    note: >-
+      Smaller than the domain sets by design. Section 16.5 of the specification
+      sizes prompt sets for domain skills; this runtime is scored against the
+      four dependency states in Section 11 and the eight areas in Section 16.10,
+      which this set covers. Negative cases are weighted heavily because an
+      always-on state manager is the worst outcome for this skill.
+
+  - id: cross-skill
+    path: prompts/cross-skill.jsonl
+    total: 8
+    composition:
+      positive: 1
+      negative: 2
+      boundary: 2
+      long-context: 3
+    rubrics:
+      - rubrics/trigger-rubric.yaml
+      - rubrics/metacognition-rubric.yaml
+      - rubrics/creativity-rubric.yaml
+    note: Derived from the cross-skill forward tests X1 through X8.
+
+holdout:
+  status: not-yet-written
+  requirement: >-
+    A private holdout set must exist before any public performance claim. Use the
+    public set for reproducibility and the holdout to detect overfitting during
+    revisions. If public scores improve while holdout scores decline, the prompt
+    set has been overfit.
+  target_size_per_skill: 20
+
+arms:
+  - id: A
+    condition: Same model and harness, no skill installed.
+  - id: B
+    condition: Same model and harness, the tested domain skill installed.
+  - id: C
+    condition: Domain skill plus manage-working-context. Long-context and recovery prompts only.
+    enabled: true
+
+design:
+  model_families_required: 3
+  trials_per_prompt_per_arm: 3
+  matched_across_arms:
+    - tools
+    - source materials
+    - temperature
+    - token budget
+    - task context
+  blinding: Randomize output order and hide condition labels during judging.
+  judges:
+    count: 2
+    constraint: Different providers. The generating model family may not be the sole judge.
+    human_review: At least a 20 percent sample of decisive comparisons, plus all severe failures.
+  ties: Permitted and reported.
+  aggregation_order: score per prompt, then aggregate, so that prompts with more trials do not dominate.
+  report_breakdowns:
+    - per model family
+    - per prompt class
+    - per skill
+
+gates:
+  trigger_precision: 0.85
+  trigger_recall: 0.75
+  negative_case_restraint: 0.90
+  constraint_preservation: 0.95
+  blind_preference_or_rubric_win_rate: 0.60
+  cross_model_direction: positive aggregate effect in at least 2 of 3 tested model families
+  severe_regressions: 0
+  reproducibility: public prompts, rubrics, run manifest, raw results, and analysis published together
+  note: These are provisional engineering gates, not scientific thresholds. Revise only from documented evaluation evidence.
+
+known_gaps:
+  - No holdout set exists yet.
+  - Long-context and recovery prompts carry inline bracketed setup notes rather than real multi-turn transcripts and prepared state files. Convert them before the benchmark freeze.
+  - Runtime recovery prompts require seeded state files on disk. Those fixtures do not exist yet.
+  - No runner is provided. Section 4 of the master specification defers scripts until forward tests identify a repeated transformation worth fixing in code.
+  - Every validation_status in all three source maps is untested.
+  - Token-savings measurement for the runtime requires a matched arm B and arm C on identical long-context prompts, which the current prompt records describe but do not yet supply as transcripts.

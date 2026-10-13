@@ -1,0 +1,13 @@
+.cognition-today/
+*.env
+.env.*
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.orig

@@ -1,0 +1,104 @@
+{
+  "manifest_version": "0.1.0-draft",
+  "status": "template",
+  "note": "This is an unfilled template. No benchmark has been run. Every null below is a required field before results may be published.",
+  "run": {
+    "run_id": null,
+    "started_at": null,
+    "completed_at": null,
+    "operator": null
+  },
+  "artifact_under_test": {
+    "repository_commit": null,
+    "skill_versions": {
+      "monitor-and-regulate-thinking": "0.1.0-unpublished",
+      "create-through-recomposition": "0.1.0-unpublished",
+      "manage-working-context": "0.1.0-unpublished"
+    },
+    "eval_manifest_version": "0.1.0-draft",
+    "eval_frozen": false
+  },
+  "prompt_sets": [
+    {
+      "id": "monitor-and-regulate-thinking",
+      "path": "../evals/prompts/monitor-and-regulate-thinking.jsonl",
+      "count": 40,
+      "exclusions": []
+    },
+    {
+      "id": "create-through-recomposition",
+      "path": "../evals/prompts/create-through-recomposition.jsonl",
+      "count": 40,
+      "exclusions": []
+    },
+    {
+      "id": "manage-working-context",
+      "path": "../evals/prompts/manage-working-context.jsonl",
+      "count": 24,
+      "exclusions": []
+    },
+    {
+      "id": "cross-skill",
+      "path": "../evals/prompts/cross-skill.jsonl",
+      "count": 8,
+      "exclusions": []
+    }
+  ],
+  "arms": [
+    { "id": "A", "condition": "baseline, no skill installed", "enabled": true },
+    { "id": "B", "condition": "domain skill installed", "enabled": true },
+    { "id": "C", "condition": "domain skill plus manage-working-context", "enabled": true, "applies_to": "long-context and recovery prompts only" }
+  ],
+  "models": [
+    { "family": null, "model": null, "provider": null, "harness": null, "harness_version": null, "temperature": null, "max_output_tokens": null, "tools_enabled": null }
+  ],
+  "trials": {
+    "per_prompt_per_arm": 3,
+    "completed": 0,
+    "failed": 0,
+    "missing": 0
+  },
+  "judging": {
+    "judges": [
+      { "model": null, "provider": null, "role": "primary" },
+      { "model": null, "provider": null, "role": "secondary" }
+    ],
+    "self_judging_prohibited": true,
+    "blinding": { "labels_hidden": true, "order_randomized": true },
+    "ties_permitted": true,
+    "position_bias_check": null,
+    "judge_agreement": null,
+    "human_review": { "sampling_method": null, "fraction_reviewed": null, "severe_failures_reviewed": "all" }
+  },
+  "rubrics": [
+    "../evals/rubrics/trigger-rubric.yaml",
+    "../evals/rubrics/metacognition-rubric.yaml",
+    "../evals/rubrics/creativity-rubric.yaml",
+    "../evals/rubrics/runtime-rubric.yaml"
+  ],
+  "cost": {
+    "input_tokens_by_arm": null,
+    "output_tokens_by_arm": null,
+    "latency_ms_by_arm": null
+  },
+  "outputs": {
+    "raw_results_dir": "raw-results/",
+    "reports_dir": "reports/"
+  },
+  "results": {
+    "aggregate": null,
+    "per_model": null,
+    "per_class": null,
+    "severe_failures": [],
+    "known_regressions": []
+  },
+  "gates": {
+    "trigger_precision": { "target": 0.85, "observed": null },
+    "trigger_recall": { "target": 0.75, "observed": null },
+    "negative_case_restraint": { "target": 0.9, "observed": null },
+    "constraint_preservation": { "target": 0.95, "observed": null },
+    "blind_preference_win_rate": { "target": 0.6, "observed": null },
+    "cross_model_direction": { "target": "positive in at least 2 of 3 families", "observed": null },
+    "severe_regressions": { "target": 0, "observed": null }
+  }
+}

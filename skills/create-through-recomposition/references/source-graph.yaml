@@ -1,0 +1,268 @@
+# Machine-readable graph and enumerations for create-through-recomposition.
+# Every table and flow in this package has an equivalent here so that an agent
+# never has to infer runtime logic from prose or from an image.
+
+meta:
+  skill: create-through-recomposition
+  source_ids:
+    - https://cognitiontoday.com/creative-cognition-construal-level-theory-psychological-distance/
+    - https://cognitiontoday.com/creative-thinking/
+    - https://cognitiontoday.com/how-ideas-come-alive-decompose-recompose/
+  author: Aditya Shukla
+  publication: Cognition Today
+  graph_status: transcribed-from-specification
+  source_visual_verified: false
+  note: >-
+    The specification anticipates a decompose-recompose source visual under
+    assets/. No image was supplied with this build, so assets/ is absent and
+    source_visual_verified is false. If the original diagram is added later,
+    verify this graph against it, set source_visual_verified to true, and
+    confirm redistribution rights before publication.
+
+# --- Decompose / modify / recompose / converge loop -------------------------
+
+nodes:
+  - id: current_entity
+    type: artifact_or_problem
+    label: The artifact, idea, or problem entering the loop
+  - id: decomposition
+    type: operation
+    label: Isolate units, relations, assumptions, and constraints
+  - id: units_and_relations
+    type: state
+    label: The working set of decomposed units and the relations among them
+  - id: modifiers
+    type: operation_set
+    label: Selected creative operators, construal shifts, and distance transformations
+  - id: recomposition
+    type: operation
+    label: Combine modified units into a coherent new form
+  - id: candidate_entity
+    type: artifact_or_solution
+    label: A structurally distinct candidate
+  - id: convergence
+    type: decision
+    label: Evaluate candidates against the criteria fixed before generation
+
+edges:
+  - from: current_entity
+    to: decomposition
+    relation: enters
+  - from: decomposition
+    to: units_and_relations
+    relation: produces
+  - from: units_and_relations
+    to: modifiers
+    relation: transformed_by
+  - from: modifiers
+    to: recomposition
+    relation: supplies_modified_units
+  - from: recomposition
+    to: candidate_entity
+    relation: produces
+  - from: candidate_entity
+    to: convergence
+    relation: evaluated_by
+  - from: convergence
+    to: decomposition
+    relation: iterates_selected_entity
+    condition: further_improvement_is_warranted
+
+# --- Enumerations ----------------------------------------------------------
+
+construal_levels:
+  layer: source-grounded
+  source_id: https://cognitiontoday.com/creative-cognition-construal-level-theory-psychological-distance/#creative-cognition-the-construal-level-theory
+  values:
+    - id: low
+      bias: Concrete, local, detailed, attribute-sensitive
+      use: Add specificity, texture, implementation detail, distinctive signals, discriminating evidence
+    - id: intermediate
+      bias: Category, function, relationship, mechanism
+      use: Reorganize modules, roles, causal structure, genre, system behaviour
+    - id: high
+      bias: Abstract, global, essence-oriented, broad
+      use: Access distant categories, alternate purposes, analogies, themes, problem frames
+  caveat: Higher construal is not uniformly better; the source notes interaction with analytical and holistic processing styles.
+
+psychological_distance:
+  layer: source-grounded
+  source_id: https://cognitiontoday.com/creative-cognition-construal-level-theory-psychological-distance/#psychological-distance-and-creativity
+  values:
+    - id: informational
+      transformation: Rename the object at a broader or narrower categorical level
+    - id: personal
+      transformation: Solve for another person, audience, stakeholder, or third-person self
+    - id: temporal
+      transformation: Consider the distant future, the distant past, or the state after incubation
+    - id: spatial
+      transformation: Relocate to another environment, market, culture, scale, or physical context
+
+creative_operators:
+  layer: source-grounded
+  source_id: https://cognitiontoday.com/creative-thinking/
+  note: Operator names are from the source. Agent translations and guardrails are design inferences.
+  values:
+    - id: default-mode-activation
+      use_when: Search is narrow or overfocused
+      guardrail: An agent does not literally activate a brain network
+    - id: chance-configurations
+      use_when: Inputs are homogeneous
+      guardrail: Randomness must be followed by relevance testing
+    - id: limit-resources
+      use_when: Choice paralysis or excessive degrees of freedom
+      guardrail: Do not violate locked constraints
+    - id: transform
+      use_when: A base idea exists but is conventional
+      guardrail: Track which component changed
+    - id: combine
+      use_when: Separate useful units can interact
+      guardrail: Re-establish coherence after combining
+    - id: change-perspective
+      use_when: Important properties are being ignored
+      guardrail: Do not impersonate lived experience as fact
+    - id: change-processing-level
+      use_when: The current level exposes only obvious neighbours
+      guardrail: Return downward before implementation
+    - id: flexible-attention
+      use_when: Attention is locked onto one feature
+      guardrail: Deliberate refocusing, not indiscriminate distraction
+    - id: retrieve-more-material
+      use_when: The recombination pool is impoverished
+      guardrail: Do not invent memories or sources
+    - id: cross-domain-borrowing
+      use_when: Domain conventions dominate
+      guardrail: Transfer the mechanism, not the surface aesthetics
+    - id: overcome-functional-fixedness
+      use_when: Tools or concepts are treated as single-purpose
+      guardrail: Respect actual physical and technical constraints
+    - id: lateral-thinking
+      use_when: An assumption creates an artificial impossibility
+      guardrail: Separate removable assumptions from real constraints
+    - id: assume-multiple-solutions
+      use_when: Premature convergence
+      guardrail: Stop when additional variants have low marginal value
+    - id: diffused-thinking
+      use_when: Structured search is exhausted
+      guardrail: Reintroduce the objective during convergence
+    - id: improvise
+      use_when: Resources or conditions change during execution
+      guardrail: Preserve safety and verify consequences
+
+blockage_routing:
+  layer: design-inference
+  keyed_on: observed_blockage
+  rules:
+    - blockage: too-conventional
+      primary: cross-domain-borrowing
+      secondary: chance-configurations
+    - blockage: too-many-possibilities
+      primary: limit-resources
+      secondary: change-processing-level-down
+    - blockage: fixed-interpretation
+      primary: change-perspective
+      secondary: psychological-distance
+    - blockage: tool-or-function-lock-in
+      primary: overcome-functional-fixedness
+      secondary: decompose-by-function
+    - blockage: repeated-failed-solution
+      primary: lateral-thinking
+      secondary: change-processing-level
+    - blockage: weak-variation
+      primary: transform
+      secondary: combine
+    - blockage: local-optimization-trap
+      primary: change-processing-level-up
+      secondary: cross-domain-borrowing
+    - blockage: vague-but-dull
+      primary: change-processing-level-down
+      secondary: flexible-attention
+    - blockage: overcontrolled-generation
+      primary: diffused-thinking
+      secondary: chance-configurations
+    - blockage: interesting-but-incoherent
+      primary: converge
+      secondary: restore-invariants
+    - blockage: attractive-but-unusable
+      primary: functional-evaluation
+      secondary: restore-invariants
+    - blockage: technically-correct-but-flat
+      primary: change-perspective
+      secondary: recompose
+
+decomposition_dimensions:
+  layer: source-grounded
+  source_id: https://cognitiontoday.com/how-ideas-come-alive-decompose-recompose/#the-decompose-recompose-model-of-ideation
+  values:
+    - components-or-modules
+    - functions-and-intended-effects
+    - relationships-and-dependencies
+    - sequence-or-narrative-causality
+    - constraints-and-invariants
+    - assumptions-and-implied-rules
+    - sensory-properties
+    - emotional-tone
+    - aesthetic-grammar
+    - audience-or-stakeholder-perspective
+    - domain-conventions
+    - available-resources-and-by-products
+    - existing-examples-and-analogues
+    - failure-evidence
+
+decomposition_depth:
+  layer: design-inference
+  values:
+    - id: shallow
+      exposes: Obvious swappable parts
+      risk: Variants stay conventional
+    - id: medium
+      exposes: Functions, roles, and relations between parts
+      risk: Usually the productive level
+    - id: deep
+      exposes: Primitive properties and atomic attributes
+      risk: The organizing structure disappears and recomposition produces noise
+
+variant_defaults:
+  layer: design-inference
+  count: 3
+  values:
+    - id: conservative-mutation
+      description: Preserves most of the current structure
+    - id: structural-alternative
+      description: Applies the primary operator to change relations or organizing principle
+    - id: high-distance-alternative
+      description: Changes construal, domain, perspective, or assumptions
+
+persistent_failure_gate:
+  layer: design-inference
+  all_must_hold:
+    - at-least-two-approaches-have-failed
+    - failed-approaches-share-the-same-problem-representation-or-assumptions
+    - evidence-has-been-collected-from-the-failures
+    - representational-change-is-more-promising-than-another-local-patch
+  on_exit: Return to deterministic diagnosis through logs, tests, reproduction, and evidence.
+
+stop_conditions:
+  - user-selected-a-direction
+  - locked-criteria-satisfied
+  - new-variants-repeat-exhausted-operators
+  - further-novelty-reduces-coherence-fidelity-feasibility-or-preference-alignment
+
+state_schema_fields:
+  - creative_objective
+  - evaluation_criteria
+  - locked_invariants
+  - current_representation
+  - failure_evidence
+  - decomposed_units
+  - relations
+  - active_construal
+  - assumptions
+  - primary_operator
+  - secondary_operators
+  - variants_generated
+  - rejected_directions
+  - preference_evidence
+  - selected_variant
+  - delta_from_previous
+  - next_transformation
