@@ -1,6 +1,6 @@
-# Smoke test — Cursor
+# Short hand-run — Cursor
 
-Fifteen hand-run prompts, roughly thirty minutes. This is not the benchmark. It is the cheapest test that can invalidate the design before any harness gets built.
+Fifteen prompts. Use this to see whether the skills fire when they should and stay quiet when they should not.
 
 The corpus is deliberately weighted away from the flattering cases. Eleven of the fifteen prompts are ones where a skill is supposed to stay out of the way or hold a hard line. Four are positives where the skill should visibly change the answer. An always-on skill is worse than no skill, so restraint is what gets measured first.
 

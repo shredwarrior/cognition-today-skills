@@ -94,7 +94,7 @@ FORBIDDEN_SKILL_FILENAMES = {
 # able to name the tokens in order to define the rule.
 PUBLICATION_BLOCKERS = ["<DONATION_URL>", "TODO", "TBD", "FIXME", "XXX", "PLACEHOLDER"]
 
-BLOCKER_SCAN_ROOTS = ["skills", "evals", "benchmarks", "README.md", "CITATION.cff"]
+BLOCKER_SCAN_ROOTS = ["skills", "evals", "README.md", "CITATION.cff", "INSTALL.md"]
 
 REQUIRED_ATTRIBUTION = [
     "Cognition Today",

@@ -1,4 +1,5 @@
 .cognition-today/
+BUILD-REPORT.md
 *.env
 .env.*
 __pycache__/

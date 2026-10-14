@@ -15,7 +15,7 @@ Every operational rule in this repository belongs to exactly one of four layers,
 | Source claim | What a Cognition Today article asserts about human cognition or behaviour | `references/source-notes.md`, `source_claim` in the source map |
 | Design inference | Why that structure might be useful in an agent workflow | `design_inference` in the source map, `[D]` in references |
 | Agent rule | The executable instruction the skill imposes | `SKILL.md`, `agent_rule` in the source map |
-| Validation result | What forward tests actually showed | `validation_status`, `benchmarks/` |
+| Validation result | What forward tests actually showed | `validation_status` |
 
 If you cannot say which layer your change belongs to, the change is not ready.
 
@@ -58,8 +58,6 @@ Structural validation is necessary and not sufficient. It cannot tell whether th
 
 **New rules need new test cases.** Add prompts to the relevant set, including at least one negative or boundary case that the new rule could plausibly break.
 
-**Do not tune on the public set alone.** The public prompts exist for reproducibility. Optimizing against them until a private holdout deteriorates is the specific failure mode this repository is trying to avoid.
-
 ## Attribution requirements
 
 Every package keeps: `Cognition Today`, `Aditya Shukla`, `https://cognitiontoday.com`, every exact source-article URL that package uses, the statement separating source claims from agent operationalization, the redistribution instruction, the warranty disclaimer, and the donation link.
@@ -98,12 +96,3 @@ In short: embed the coordination block verbatim, declare it in `SKILL.md` and no
 
 You should not need to modify the runtime to add a skill. If you do, that is a capsule-contract version change and needs approval.
 
-## What is most useful right now
-
-This build has never been forward-tested. In rough order of value:
-
-1. Reading the source articles and resolving the `pending` rows in each `references/source-notes.md` verification ledger. Most urgent for `manage-working-context`, where all three cited articles are unread.
-2. Running any prompt set on any model and reporting what happened.
-3. Exercising the runtime against a real long session and reporting what the state files actually looked like. No state file has ever been written by this skill.
-4. Adversarial prompts that break a guardrail.
-5. Installation reports from clients that have not been tested.

@@ -2,19 +2,12 @@ cff-version: 1.2.0
 message: "If you use these skills or the conversion method, please cite the originating Cognition Today work."
 title: "Simulated Cognitive Skills for LLM Creativity and Metacognition"
 abstract: >-
-  Agent Skills that convert cognitive-psychology frameworks published on Cognition
-  Today into explicit, auditable agent procedures with bounded activation, source
-  provenance, state contracts, and documented failure conditions. The skills
-  simulate the structure of human cognitive functions as executable procedures;
-  they do not claim the functions themselves. This release contains two domain
-  skills, Simulated Metacognition (monitor-and-regulate-thinking) and Simulated
-  Creative Cognition (create-through-recomposition), and the shared runtime they
-  coordinate with, Simulated Working Memory (manage-working-context), which
-  preserves objective, decisions, rejections, and source provenance across
-  context compaction.
+  Agent skills that simulate metacognition, creative cognition, and working
+  memory as executable procedures, compiled from Cognition Today articles by
+  Aditya Shukla.
 type: software
-version: 0.1.0-unpublished
-date-released: null
+version: 0.1.0
+date-released: 2026-10-14
 license: CC-BY-NC-SA-4.0
 url: "https://cognitiontoday.com"
 repository-code: "https://github.com/shredwarrior/cognition-today-skills"
